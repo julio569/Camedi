@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -v \"^/Users/juliojosenacifsottimano/Proyecto cirugia guardias$\")",
+      "Bash(python3 -c ' *)"
+    ]
+  }
+}

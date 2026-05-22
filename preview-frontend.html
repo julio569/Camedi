@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Guardias Médicas — Preview</title>
+
+<!-- Tailwind CSS via CDN (solo para el preview; en producción se usa igual) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- Tipografías -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --ink: #14201f;
+    --ink-soft: #4a5856;
+    --ink-mute: #8a948f;
+    --line: #e6e2d8;
+    --primary: #0f3b3a;       /* verde petróleo */
+    --primary-soft: #1c5552;
+    --accent: #c08a4a;        /* dorado apagado */
+    --accent-soft: #f0e3cf;
+    --ok: #2f7d4c;
+    --warn: #b4791a;
+    --bad: #a83232;
+    --info: #2f5d7d;
+  }
+  html, body { background: var(--bg); color: var(--ink); font-family: 'Outfit', sans-serif; }
+  .font-display { font-family: 'Fraunces', serif; font-optical-sizing: auto; }
+  .border-line { border-color: var(--line); }
+  .bg-surface { background: var(--surface); }
+  .bg-primary { background: var(--primary); }
+  .bg-primary-soft { background: var(--primary-soft); }
+  .bg-accent { background: var(--accent); }
+  .bg-accent-soft { background: var(--accent-soft); }
+  .text-primary { color: var(--primary); }
+  .text-accent { color: var(--accent); }
+  .text-ink { color: var(--ink); }
+  .text-ink-soft { color: var(--ink-soft); }
+  .text-ink-mute { color: var(--ink-mute); }
+
+  /* Estilos de chips de guardia en el calendario */
+  .chip-libre { background: #e7f0e8; color: #1f5530; border: 1px solid #cfe1d3; }
+  .chip-pocos { background: #fdf3d7; color: #6b4d0a; border: 1px solid #f3e2a8; }
+  .chip-lleno { background: #ece8e1; color: #6a6358; border: 1px solid #d8d2c4; }
+  .chip-mio   { background: #d8e6f0; color: #1d4360; border: 1px solid #b6cee0; }
+
+  /* Subrayado decorativo de títulos */
+  .underline-deco { position: relative; display: inline-block; }
+  .underline-deco::after {
+    content: ""; position: absolute; left: 0; right: 0; bottom: -6px;
+    height: 6px; background: var(--accent-soft); border-radius: 3px; z-index: -1;
+  }
+
+  /* Selector de vistas (top bar de demo) */
+  .demo-tab {
+    padding: 8px 16px; border-radius: 999px; font-size: 13px; font-weight: 500;
+    color: var(--ink-soft); cursor: pointer; transition: all .15s;
+    border: 1px solid transparent;
+  }
+  .demo-tab:hover { background: rgba(0,0,0,0.04); }
+  .demo-tab.active {
+    background: var(--ink); color: white;
+  }
+
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Botón primario */
+  .btn-primary {
+    background: var(--primary); color: white; padding: 10px 18px;
+    border-radius: 8px; font-weight: 500; transition: all .15s;
+  }
+  .btn-primary:hover { background: var(--primary-soft); }
+  .btn-ghost {
+    color: var(--ink); padding: 10px 18px; border-radius: 8px;
+    font-weight: 500; border: 1px solid var(--line); background: white;
+    transition: all .15s;
+  }
+  .btn-ghost:hover { background: #f0ede5; }
+  .btn-accent {
+    background: var(--accent); color: white; padding: 10px 18px;
+    border-radius: 8px; font-weight: 500;
+  }
+
+  /* Inputs */
+  .input {
+    width: 100%; padding: 12px 14px; border: 1px solid var(--line);
+    border-radius: 8px; background: white; font-size: 14px; color: var(--ink);
+    transition: border-color .15s;
+  }
+  .input:focus { outline: none; border-color: var(--primary); }
+  label { font-size: 13px; color: var(--ink-soft); font-weight: 500; }
+
+  /* Sidebar nav item */
+  .nav-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 10px 14px; border-radius: 8px; color: var(--ink-soft);
+    font-size: 14px; font-weight: 500; cursor: pointer; transition: all .15s;
+  }
+  .nav-item:hover { background: rgba(0,0,0,0.04); color: var(--ink); }
+  .nav-item.active { background: var(--ink); color: white; }
+  .nav-item .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .5; }
+
+  /* Card de guardia */
+  .guardia-card {
+    background: white; border: 1px solid var(--line); border-radius: 12px;
+    padding: 18px; transition: all .15s;
+  }
+  .guardia-card:hover { border-color: var(--primary); transform: translateY(-1px); }
+
+  /* Calendario */
+  .cal-cell {
+    background: white; border: 1px solid var(--line); min-height: 110px;
+    padding: 8px; position: relative; font-size: 12px;
+  }
+  .cal-cell.other-month { background: #faf8f3; color: var(--ink-mute); }
+  .cal-day-num { font-weight: 600; font-size: 13px; color: var(--ink); }
+  .cal-cell.other-month .cal-day-num { color: var(--ink-mute); font-weight: 400; }
+
+  .chip {
+    font-size: 10.5px; padding: 3px 6px; border-radius: 4px; margin-top: 4px;
+    display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    cursor: pointer;
+  }
+
+  /* Tabla admin */
+  .table-row { border-bottom: 1px solid var(--line); transition: background .15s; }
+  .table-row:hover { background: #faf8f3; }
+
+  /* Badge */
+  .badge {
+    display: inline-block; padding: 2px 8px; border-radius: 999px;
+    font-size: 11px; font-weight: 500;
+  }
+  .badge-ok   { background: #e7f0e8; color: #1f5530; }
+  .badge-warn { background: #fdf3d7; color: #6b4d0a; }
+  .badge-bad  { background: #f5dede; color: #7a2424; }
+
+  /* Decoración: línea acento arriba a la izquierda del header */
+  .deco-line {
+    width: 36px; height: 3px; background: var(--accent); border-radius: 2px;
+  }
+
+  /* Indicadores de sede (cada sede tiene su color) */
+  .sede-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 6px; vertical-align: middle; }
+  .sede-central { background: #c08a4a; }   /* dorado */
+  .sede-norte   { background: #2f7d4c; }   /* verde */
+  .sede-sur     { background: #2f5d7d; }   /* azul */
+  .sede-este    { background: #a83232; }   /* rojo */
+</style>
+</head>
+
+<body>
+
+<!-- ================== BARRA DE DEMO (solo para preview) ================== -->
+<div class="bg-surface border-b border-line sticky top-0 z-50">
+  <div class="max-w-[1400px] mx-auto px-6 py-3 flex items-center justify-between gap-4 flex-wrap">
+    <div class="flex items-center gap-3">
+      <div class="deco-line"></div>
+      <span class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold">Preview</span>
+      <span class="font-display text-lg">Guardias Médicas</span>
+    </div>
+    <div class="flex items-center gap-1 bg-bg p-1 rounded-full">
+      <button class="demo-tab active" data-view="login">Login</button>
+      <button class="demo-tab" data-view="medico">Vista Médico</button>
+      <button class="demo-tab" data-view="admin">Vista Admin</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ============================ VISTA: LOGIN ============================ -->
+<section id="view-login" class="view active">
+  <div class="min-h-[calc(100vh-65px)] grid lg:grid-cols-2">
+
+    <!-- Columna izquierda: branding -->
+    <div class="bg-primary text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden">
+      <!-- patrón decorativo -->
+      <div class="absolute inset-0 opacity-[0.06]" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;"></div>
+
+      <div class="relative">
+        <div class="flex items-center gap-3 mb-2">
+          <div class="w-2 h-2 rounded-full bg-accent"></div>
+          <span class="text-xs uppercase tracking-[0.2em] text-white/70">Sistema de guardias</span>
+        </div>
+        <div class="font-display text-3xl">Guardias Médicas</div>
+      </div>
+
+      <div class="relative max-w-md">
+        <h1 class="font-display text-5xl lg:text-6xl leading-[1.05] mb-6">
+          Tu trimestre,<br/>
+          <span class="italic text-accent">organizado</span>.
+        </h1>
+        <p class="text-white/70 text-base leading-relaxed">
+          Inscribite a las guardias de 24 horas del próximo trimestre,
+          consultá tu calendario y gestioná tus turnos desde un solo lugar.
+        </p>
+      </div>
+
+      <div class="relative text-xs text-white/50">
+        © 2026 — Acceso restringido a profesionales habilitados.
+      </div>
+    </div>
+
+    <!-- Columna derecha: formulario -->
+    <div class="p-8 lg:p-16 flex items-center justify-center">
+      <div class="w-full max-w-sm">
+        <div class="mb-8">
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Iniciar sesión</div>
+          <h2 class="font-display text-3xl">Bienvenido de vuelta</h2>
+          <p class="text-ink-soft mt-2 text-sm">Ingresá con tu email y contraseña.</p>
+        </div>
+
+        <form class="space-y-4">
+          <div>
+            <label for="email">Email</label>
+            <input id="email" type="email" class="input mt-1.5" placeholder="dr.perez@hospital.com" />
+          </div>
+          <div>
+            <div class="flex justify-between items-center">
+              <label for="pass">Contraseña</label>
+              <a href="#" class="text-xs text-primary hover:underline">¿La olvidaste?</a>
+            </div>
+            <input id="pass" type="password" class="input mt-1.5" placeholder="••••••••" />
+          </div>
+
+          <button type="button" class="btn-primary w-full mt-2">Entrar</button>
+
+          <div class="relative my-6">
+            <div class="absolute inset-0 flex items-center"><div class="w-full border-t border-line"></div></div>
+            <div class="relative flex justify-center"><span class="bg-bg px-3 text-xs text-ink-mute">o</span></div>
+          </div>
+
+          <button type="button" class="btn-ghost w-full">Crear cuenta nueva</button>
+        </form>
+
+        <p class="text-xs text-ink-mute text-center mt-8">
+          Las cuentas nuevas requieren aprobación del administrador.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ========================= VISTA: MÉDICO ========================= -->
+<section id="view-medico" class="view">
+  <div class="max-w-[1400px] mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+
+    <!-- SIDEBAR -->
+    <aside class="bg-surface border border-line rounded-xl p-5 h-fit lg:sticky lg:top-20">
+      <div class="flex items-center gap-3 pb-5 border-b border-line">
+        <div class="w-11 h-11 rounded-full bg-primary text-white flex items-center justify-center font-display text-lg">JP</div>
+        <div>
+          <div class="font-medium text-sm">Dr. Juan Pérez</div>
+          <div class="text-xs text-ink-mute">Cardiología · MN 12345</div>
+        </div>
+      </div>
+
+      <nav class="mt-4 space-y-1">
+        <div class="nav-item active"><span class="dot"></span> Calendario</div>
+        <div class="nav-item"><span class="dot"></span> Mis guardias</div>
+        <div class="nav-item"><span class="dot"></span> Historial</div>
+        <div class="nav-item"><span class="dot"></span> Mi perfil</div>
+      </nav>
+
+      <div class="mt-6 p-4 bg-accent-soft rounded-lg">
+        <div class="text-xs font-semibold text-ink uppercase tracking-wider mb-1">Este trimestre</div>
+        <div class="font-display text-3xl text-primary">5 / 12</div>
+        <div class="text-xs text-ink-soft mt-1">Guardias inscriptas / disponibles</div>
+      </div>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main>
+      <!-- Header -->
+      <header class="flex items-end justify-between mb-6 flex-wrap gap-4">
+        <div>
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-1">Trimestre</div>
+          <h1 class="font-display text-4xl"><span class="underline-deco">2026 — Q2</span></h1>
+          <p class="text-ink-soft text-sm mt-2">Abril · Mayo · Junio</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <select class="input !py-2 !text-sm" style="width: auto;">
+            <option>Todas las sedes</option>
+            <option>Hospital Central</option>
+            <option>Clínica Norte</option>
+            <option>Sanatorio Sur</option>
+          </select>
+          <button class="btn-ghost text-sm">Q1 ←</button>
+          <button class="btn-ghost text-sm">Q3 →</button>
+        </div>
+      </header>
+
+      <!-- Leyenda -->
+      <div class="flex items-center gap-4 mb-4 text-xs flex-wrap">
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded chip-libre"></span> Cupo libre</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded chip-pocos"></span> Último cupo</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded chip-lleno"></span> Completa</span>
+        <span class="flex items-center gap-2"><span class="w-3 h-3 rounded chip-mio"></span> Estoy inscripto</span>
+      </div>
+
+      <!-- Calendario -->
+      <div class="bg-surface border border-line rounded-xl overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+          <h2 class="font-display text-2xl">Mayo</h2>
+          <div class="flex gap-1">
+            <button class="btn-ghost !py-1.5 !px-3 text-xs">←</button>
+            <button class="btn-ghost !py-1.5 !px-3 text-xs">→</button>
+          </div>
+        </div>
+
+        <!-- Días de la semana -->
+        <div class="grid grid-cols-7 text-center text-xs uppercase tracking-wider text-ink-mute font-semibold border-b border-line">
+          <div class="py-2">Lun</div><div class="py-2">Mar</div><div class="py-2">Mié</div>
+          <div class="py-2">Jue</div><div class="py-2">Vie</div><div class="py-2">Sáb</div><div class="py-2">Dom</div>
+        </div>
+
+        <!-- Grid del mes (6 semanas) -->
+        <div class="grid grid-cols-7" id="calendario"></div>
+      </div>
+
+      <!-- Próximas guardias -->
+      <section class="mt-8">
+        <h2 class="font-display text-2xl mb-4"><span class="underline-deco">Mis próximas guardias</span></h2>
+        <div class="grid md:grid-cols-2 gap-4">
+
+          <div class="guardia-card">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="text-xs text-ink-mute uppercase tracking-wider">Sábado</div>
+                <div class="font-display text-2xl">10 de mayo</div>
+              </div>
+              <span class="badge badge-ok">Confirmada</span>
+            </div>
+            <div class="space-y-1 text-sm text-ink-soft">
+              <div>🕗 08:00 → 24 hs</div>
+              <div>🏥 Hospital Central — Guardia general</div>
+              <div>👥 3 médicos asignados</div>
+            </div>
+            <div class="flex gap-2 mt-4 pt-4 border-t border-line">
+              <button class="btn-ghost text-xs flex-1">Ver detalle</button>
+              <button class="btn-ghost text-xs text-bad">Cancelar</button>
+            </div>
+          </div>
+
+          <div class="guardia-card">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="text-xs text-ink-mute uppercase tracking-wider">Miércoles</div>
+                <div class="font-display text-2xl">21 de mayo</div>
+              </div>
+              <span class="badge badge-ok">Confirmada</span>
+            </div>
+            <div class="space-y-1 text-sm text-ink-soft">
+              <div>🕗 08:00 → 24 hs</div>
+              <div>🏥 Clínica Norte — Cardiología</div>
+              <div>👥 2 médicos asignados</div>
+            </div>
+            <div class="flex gap-2 mt-4 pt-4 border-t border-line">
+              <button class="btn-ghost text-xs flex-1">Ver detalle</button>
+              <button class="btn-ghost text-xs text-bad">Cancelar</button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+    </main>
+  </div>
+</section>
+
+
+<!-- ========================= VISTA: ADMIN ========================= -->
+<section id="view-admin" class="view">
+  <div class="max-w-[1400px] mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-[260px_1fr] gap-6">
+
+    <!-- SIDEBAR -->
+    <aside class="bg-surface border border-line rounded-xl p-5 h-fit lg:sticky lg:top-20">
+      <div class="flex items-center gap-3 pb-5 border-b border-line">
+        <div class="w-11 h-11 rounded-full bg-accent text-white flex items-center justify-center font-display text-lg">AD</div>
+        <div>
+          <div class="font-medium text-sm">Admin</div>
+          <div class="text-xs text-ink-mute">Coordinación general</div>
+        </div>
+      </div>
+
+      <nav class="mt-4 space-y-1">
+        <div class="nav-item active"><span class="dot"></span> Guardias</div>
+        <div class="nav-item"><span class="dot"></span> Médicos</div>
+        <div class="nav-item"><span class="dot"></span> Solicitudes <span class="ml-auto badge badge-warn">3</span></div>
+        <div class="nav-item"><span class="dot"></span> Sedes</div>
+        <div class="nav-item"><span class="dot"></span> Trimestres</div>
+        <div class="nav-item"><span class="dot"></span> Reportes</div>
+      </nav>
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main>
+      <!-- Header -->
+      <header class="flex items-end justify-between mb-6 flex-wrap gap-4">
+        <div>
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-1">Panel administrador</div>
+          <h1 class="font-display text-4xl"><span class="underline-deco">Gestión de guardias</span></h1>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn-ghost text-sm">Carga en lote</button>
+          <button class="btn-primary text-sm">+ Nueva guardia</button>
+        </div>
+      </header>
+
+      <!-- Stats -->
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="bg-surface border border-line rounded-xl p-5">
+          <div class="text-xs text-ink-mute uppercase tracking-wider">Guardias del trimestre</div>
+          <div class="font-display text-3xl mt-1">42</div>
+        </div>
+        <div class="bg-surface border border-line rounded-xl p-5">
+          <div class="text-xs text-ink-mute uppercase tracking-wider">Cupos cubiertos</div>
+          <div class="font-display text-3xl mt-1 text-primary">87%</div>
+        </div>
+        <div class="bg-surface border border-line rounded-xl p-5">
+          <div class="text-xs text-ink-mute uppercase tracking-wider">Médicos activos</div>
+          <div class="font-display text-3xl mt-1">28</div>
+        </div>
+        <div class="bg-surface border border-line rounded-xl p-5">
+          <div class="text-xs text-ink-mute uppercase tracking-wider">Sin cubrir</div>
+          <div class="font-display text-3xl mt-1 text-bad" style="color: var(--bad);">5</div>
+        </div>
+      </div>
+
+      <!-- Tabla -->
+      <div class="bg-surface border border-line rounded-xl overflow-hidden">
+        <div class="flex items-center justify-between px-5 py-4 border-b border-line">
+          <h2 class="font-display text-2xl">Guardias de mayo</h2>
+          <div class="flex gap-2 text-xs">
+            <input type="text" placeholder="Buscar..." class="input !py-1.5 !text-xs" style="width: 200px;" />
+            <button class="btn-ghost !py-1.5 !text-xs">Filtros</button>
+          </div>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs uppercase tracking-wider text-ink-mute border-b border-line">
+                <th class="px-5 py-3">Fecha</th>
+                <th class="px-5 py-3">Hospital / Servicio</th>
+                <th class="px-5 py-3">Horario</th>
+                <th class="px-5 py-3">Cupos</th>
+                <th class="px-5 py-3">Estado</th>
+                <th class="px-5 py-3"></th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="font-medium">Sáb 10 May</div>
+                  <div class="text-xs text-ink-mute">08:00</div>
+                </td>
+                <td class="px-5 py-4">
+                  <div><span class="sede-dot sede-central"></span>Hospital Central</div>
+                  <div class="text-xs text-ink-mute pl-4">Guardia general</div>
+                </td>
+                <td class="px-5 py-4">24 hs</td>
+                <td class="px-5 py-4"><span class="font-medium">3 / 3</span></td>
+                <td class="px-5 py-4"><span class="badge badge-ok">Completa</span></td>
+                <td class="px-5 py-4 text-right">
+                  <button class="text-xs text-primary hover:underline">Ver inscriptos</button>
+                </td>
+              </tr>
+
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="font-medium">Dom 11 May</div>
+                  <div class="text-xs text-ink-mute">08:00</div>
+                </td>
+                <td class="px-5 py-4">
+                  <div><span class="sede-dot sede-norte"></span>Clínica Norte</div>
+                  <div class="text-xs text-ink-mute pl-4">Cardiología</div>
+                </td>
+                <td class="px-5 py-4">24 hs</td>
+                <td class="px-5 py-4"><span class="font-medium">1 / 2</span></td>
+                <td class="px-5 py-4"><span class="badge badge-warn">1 cupo libre</span></td>
+                <td class="px-5 py-4 text-right">
+                  <button class="text-xs text-primary hover:underline">Ver inscriptos</button>
+                </td>
+              </tr>
+
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="font-medium">Mar 13 May</div>
+                  <div class="text-xs text-ink-mute">20:00</div>
+                </td>
+                <td class="px-5 py-4">
+                  <div><span class="sede-dot sede-central"></span>Hospital Central</div>
+                  <div class="text-xs text-ink-mute pl-4">Pediatría</div>
+                </td>
+                <td class="px-5 py-4">24 hs</td>
+                <td class="px-5 py-4"><span class="font-medium">0 / 2</span></td>
+                <td class="px-5 py-4"><span class="badge badge-bad">Sin cubrir</span></td>
+                <td class="px-5 py-4 text-right">
+                  <button class="text-xs text-primary hover:underline">Asignar médico</button>
+                </td>
+              </tr>
+
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="font-medium">Mié 21 May</div>
+                  <div class="text-xs text-ink-mute">08:00</div>
+                </td>
+                <td class="px-5 py-4">
+                  <div><span class="sede-dot sede-norte"></span>Clínica Norte</div>
+                  <div class="text-xs text-ink-mute pl-4">Cardiología</div>
+                </td>
+                <td class="px-5 py-4">24 hs</td>
+                <td class="px-5 py-4"><span class="font-medium">2 / 2</span></td>
+                <td class="px-5 py-4"><span class="badge badge-ok">Completa</span></td>
+                <td class="px-5 py-4 text-right">
+                  <button class="text-xs text-primary hover:underline">Ver inscriptos</button>
+                </td>
+              </tr>
+
+              <tr class="table-row">
+                <td class="px-5 py-4">
+                  <div class="font-medium">Sáb 24 May</div>
+                  <div class="text-xs text-ink-mute">08:00</div>
+                </td>
+                <td class="px-5 py-4">
+                  <div><span class="sede-dot sede-sur"></span>Sanatorio Sur</div>
+                  <div class="text-xs text-ink-mute pl-4">Guardia general</div>
+                </td>
+                <td class="px-5 py-4">24 hs</td>
+                <td class="px-5 py-4"><span class="font-medium">2 / 3</span></td>
+                <td class="px-5 py-4"><span class="badge badge-warn">1 cupo libre</span></td>
+                <td class="px-5 py-4 text-right">
+                  <button class="text-xs text-primary hover:underline">Ver inscriptos</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="px-5 py-3 border-t border-line text-xs text-ink-mute flex justify-between">
+          <span>Mostrando 5 de 14 guardias en mayo</span>
+          <div class="flex gap-1">
+            <button class="btn-ghost !py-1 !px-2 !text-xs">←</button>
+            <button class="btn-ghost !py-1 !px-2 !text-xs">→</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Solicitudes pendientes -->
+      <section class="mt-8">
+        <h2 class="font-display text-2xl mb-4"><span class="underline-deco">Solicitudes de alta pendientes</span></h2>
+        <div class="bg-surface border border-line rounded-xl divide-y divide-[var(--line)]">
+          <div class="p-4 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div class="font-medium">Dra. María González</div>
+              <div class="text-xs text-ink-mute">MN 28491 · Clínica médica · maria.g@email.com</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-ghost text-xs">Rechazar</button>
+              <button class="btn-primary text-xs">Aprobar</button>
+            </div>
+          </div>
+          <div class="p-4 flex items-center justify-between flex-wrap gap-3">
+            <div>
+              <div class="font-medium">Dr. Roberto Sánchez</div>
+              <div class="text-xs text-ink-mute">MN 31204 · Pediatría · roberto.s@email.com</div>
+            </div>
+            <div class="flex gap-2">
+              <button class="btn-ghost text-xs">Rechazar</button>
+              <button class="btn-primary text-xs">Aprobar</button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+</section>
+
+
+<script>
+  // -------------------------- Cambio de vista (demo) --------------------------
+  document.querySelectorAll('.demo-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.demo-tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById('view-' + tab.dataset.view).classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+  });
+
+  // -------------------------- Generación del calendario --------------------------
+  // Mockup: mayo 2026 empieza un viernes (1 de mayo de 2026 = viernes)
+  // Ojo: lo armamos con lunes como primer día de la semana (formato AR)
+  const cal = document.getElementById('calendario');
+  const guardias = {
+    // día -> [{tipo, label}]
+    3:  [{ tipo: 'lleno', label: 'H. Central' }],
+    7:  [{ tipo: 'libre', label: 'Cl. Norte · Pediat.' }],
+    10: [{ tipo: 'mio',   label: 'H. Central · Gral.' }],
+    11: [{ tipo: 'pocos', label: 'Cl. Norte · Cardio' }],
+    13: [{ tipo: 'lleno', label: 'H. Central · Pediat.' }],
+    17: [{ tipo: 'libre', label: 'Cl. Norte' }],
+    21: [{ tipo: 'mio',   label: 'Cl. Norte · Cardio' }],
+    24: [{ tipo: 'pocos', label: 'H. Central · Gral.' }],
+    28: [{ tipo: 'libre', label: 'H. Central' }],
+    31: [{ tipo: 'libre', label: 'Cl. Norte' }],
+  };
+
+  // En mayo 2026: el día 1 cae viernes. Formato lun=0..dom=6.
+  // Empezamos el grid en el lunes anterior (28 abr).
+  function buildCalendar() {
+    const cells = [];
+    // 28, 29, 30 abril (otro mes)
+    [28, 29, 30].forEach(d => cells.push({ day: d, otherMonth: true }));
+    // 1 al 31 de mayo
+    for (let d = 1; d <= 31; d++) cells.push({ day: d, otherMonth: false });
+    // Completar a 42 celdas (6 semanas) con junio
+    let restantes = 42 - cells.length;
+    for (let d = 1; d <= restantes; d++) cells.push({ day: d, otherMonth: true });
+
+    cal.innerHTML = cells.map(c => {
+      const items = (!c.otherMonth && guardias[c.day]) ? guardias[c.day] : [];
+      const chips = items.map(g => `<span class="chip chip-${g.tipo}">${g.label}</span>`).join('');
+      return `
+        <div class="cal-cell ${c.otherMonth ? 'other-month' : ''}">
+          <div class="cal-day-num">${c.day}</div>
+          ${chips}
+        </div>
+      `;
+    }).join('');
+  }
+  buildCalendar();
+</script>
+
+</body>
+</html>

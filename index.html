@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Camedi</title>
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <link rel="manifest" href="/manifest.json" />
+  <meta name="theme-color" content="#0f3b3a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Camedi" />
+  <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+
+  <!-- Tailwind CSS (pre-compilado) -->
+  <link rel="stylesheet" href="css/tailwind.css" />
+
+  <!-- Tipografías -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700;1,800&display=swap" rel="stylesheet" />
+
+  <!-- Estilos custom -->
+  <link rel="stylesheet" href="css/styles.css" />
+
+  <style>
+    /* ── Variables — Modo claro ──────────────────────────── */
+    :root {
+      --bg:           #eef5f3;
+      --surface:      #ffffff;
+      --ink:          #0d1f1e;
+      --ink-soft:     #3a5452;
+      --ink-mute:     #7a9896;
+      --line:         #d4e4e2;
+      --primary:      #0f3b3a;
+      --primary-soft: #1c5552;
+      --accent:       #c08a4a;
+      --accent-soft:  rgba(192,138,74,0.13);
+      --ok:           #1e7a46;
+      --warn:         #a86c18;
+      --bad:          #a02828;
+      --info:         #1e507a;
+      --shadow-sm:    0 2px 10px rgba(15,59,58,0.07);
+      --shadow-md:    0 4px 24px rgba(15,59,58,0.10), 0 1px 4px rgba(0,0,0,0.04);
+      --shadow-lg:    0 10px 44px rgba(15,59,58,0.13), 0 2px 8px rgba(0,0,0,0.05);
+      --shadow-btn:   0 4px 14px rgba(15,59,58,0.30);
+      --shadow-btn-h: 0 8px 24px rgba(15,59,58,0.44);
+    }
+
+    /* ── Variables — Modo oscuro ─────────────────────────── */
+    html[data-theme="dark"] {
+      --bg:           #091817;
+      --surface:      #112b29;
+      --ink:          #ddecea;
+      --ink-soft:     #7aa8a4;
+      --ink-mute:     #3e6a66;
+      --line:         rgba(255,255,255,0.09);
+      --primary:      #1e9692;
+      --primary-soft: #28b4b0;
+      --accent:       #d4a060;
+      --accent-soft:  rgba(212,160,96,0.15);
+      --ok:           #28a060;
+      --warn:         #d4961e;
+      --bad:          #e05050;
+      --info:         #3878b0;
+      --shadow-sm:    0 2px 10px rgba(0,0,0,0.35);
+      --shadow-md:    0 4px 24px rgba(0,0,0,0.45), 0 1px 4px rgba(0,0,0,0.2);
+      --shadow-lg:    0 10px 44px rgba(0,0,0,0.55), 0 2px 8px rgba(0,0,0,0.3);
+      --shadow-btn:   0 4px 14px rgba(0,0,0,0.50);
+      --shadow-btn-h: 0 8px 24px rgba(0,0,0,0.60);
+    }
+
+    /* ── Base ────────────────────────────────────────────── */
+    html, body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* Degradado de fondo */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 65% 45% at 8% 12%, rgba(15,59,58,0.08) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 55% at 90% 80%, rgba(192,138,74,0.06) 0%, transparent 50%);
+      pointer-events: none;
+      z-index: 0;
+    }
+    html[data-theme="dark"] body::before {
+      background:
+        radial-gradient(ellipse 65% 45% at 8% 12%, rgba(30,150,146,0.07) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 55% at 90% 80%, rgba(212,160,96,0.04) 0%, transparent 50%);
+    }
+
+    /* ── Tipografía ──────────────────────────────────────── */
+    .font-display {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    /* ── Colores utilitarios ─────────────────────────────── */
+    .bg-surface      { background: var(--surface); }
+    .bg-primary      { background: var(--primary); }
+    .bg-primary-soft { background: var(--primary-soft); }
+    .bg-accent       { background: var(--accent); }
+    .bg-accent-soft  { background: var(--accent-soft); }
+    .bg-bg           { background: var(--bg); }
+    .text-primary    { color: var(--primary); }
+    .text-accent     { color: var(--accent); }
+    .text-ink        { color: var(--ink); }
+    .text-ink-soft   { color: var(--ink-soft); }
+    .text-ink-mute   { color: var(--ink-mute); }
+    .text-bad        { color: var(--bad); }
+    .border-line     { border-color: var(--line); }
+
+    /* ── Chips del calendario ────────────────────────────── */
+    .chip-libre      { background: #e6f2e8; color: #1a5530; border: 1px solid #c8dece; }
+    .chip-pocos      { background: #fdf4d8; color: #6a4d0a; border: 1px solid #f2e2a0; }
+    .chip-lleno      { background: #eceae4; color: #6a6158; border: 1px solid #d8d2c4; }
+    .chip-mio        { background: #d8e8f2; color: #1a4060; border: 1px solid #aecce0; }
+    .chip-finalizada { background: #dce8e4; color: #2a5044; border: 1px solid #a8cfbc; opacity: .85; }
+    .chip-pasada     { background: #eeecea; color: #9a9490; border: 1px solid #d4d0c8; opacity: .65; }
+
+    html[data-theme="dark"] .chip-libre      { background: rgba(40,160,96,.14); color: #58d498; border-color: rgba(40,160,96,.2); }
+    html[data-theme="dark"] .chip-pocos      { background: rgba(212,150,30,.14); color: #eebb48; border-color: rgba(212,150,30,.2); }
+    html[data-theme="dark"] .chip-lleno      { background: rgba(255,255,255,.06); color: #80a8a4; border-color: rgba(255,255,255,.09); }
+    html[data-theme="dark"] .chip-mio        { background: rgba(56,120,176,.18); color: #78b8e0; border-color: rgba(56,120,176,.24); }
+    html[data-theme="dark"] .chip-finalizada { background: rgba(30,150,146,.1); color: #58aeaa; border-color: rgba(30,150,146,.17); opacity: .85; }
+    html[data-theme="dark"] .chip-pasada     { background: rgba(255,255,255,.05); color: #486a66; border-color: rgba(255,255,255,.07); opacity: .65; }
+
+    /* ── Botones ─────────────────────────────────────────── */
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-soft) 100%);
+      color: white;
+      padding: 11px 24px;
+      border-radius: 9999px;
+      font-weight: 600;
+      font-size: 14px;
+      letter-spacing: 0.01em;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: var(--shadow-btn);
+      transition: transform .18s cubic-bezier(.4,0,.2,1), box-shadow .18s, background .18s;
+      cursor: pointer;
+    }
+    .btn-primary:hover:not(:disabled) {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-btn-h);
+    }
+    .btn-primary:active:not(:disabled) { transform: translateY(0); box-shadow: var(--shadow-sm); }
+    .btn-primary:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-ghost {
+      color: var(--ink);
+      padding: 11px 22px;
+      border-radius: 9999px;
+      font-weight: 500;
+      font-size: 14px;
+      border: 1.5px solid var(--line);
+      background: var(--surface);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: transform .15s, box-shadow .15s, background .15s, border-color .15s;
+      cursor: pointer;
+    }
+    .btn-ghost:hover:not(:disabled) {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      transform: translateY(-1px);
+    }
+    .btn-ghost:active:not(:disabled) { transform: translateY(0); }
+    .btn-ghost:disabled { opacity: .5; cursor: not-allowed; }
+
+    .btn-accent {
+      background: linear-gradient(135deg, var(--accent) 0%, #d49a50 100%);
+      color: white;
+      padding: 11px 24px;
+      border-radius: 9999px;
+      font-weight: 600;
+      border: none;
+    }
+
+    /* ── Inputs ──────────────────────────────────────────── */
+    .input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1.5px solid var(--line);
+      border-radius: 14px;
+      background: var(--surface);
+      font-size: 14px;
+      color: var(--ink);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      transition: border-color .15s, box-shadow .15s, background .15s;
+    }
+    .input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(15,59,58,0.10);
+    }
+    html[data-theme="dark"] .input:focus {
+      box-shadow: 0 0 0 3px rgba(30,150,146,0.18);
+    }
+    .input.error { border-color: var(--bad); }
+    label { font-size: 13px; color: var(--ink-soft); font-weight: 600; letter-spacing: 0.01em; }
+
+    /* ── Mensajes de error / éxito ───────────────────────── */
+    .msg-error {
+      background: rgba(160,40,40,0.08);
+      border: 1.5px solid rgba(160,40,40,0.22);
+      color: var(--bad);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+    }
+    .msg-ok {
+      background: rgba(30,122,70,0.08);
+      border: 1.5px solid rgba(30,122,70,0.22);
+      color: var(--ok);
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
+      font-weight: 500;
+      display: none;
+    }
+    .msg-error.visible, .msg-ok.visible { display: block; }
+
+    /* ── Spinner de carga ────────────────────────────────── */
+    .spinner {
+      width: 16px; height: 16px;
+      border: 2.5px solid rgba(255,255,255,.3);
+      border-top-color: white;
+      border-radius: 50%;
+      animation: spin .6s linear infinite;
+      display: none;
+    }
+    .spinner.oscuro {
+      border-color: rgba(0,0,0,.12);
+      border-top-color: var(--ink);
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    @keyframes pulse-soft { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: .65; transform: scale(.96); } }
+
+    /* ── Vistas (router) ─────────────────────────────────── */
+    .vista:not(.activa) { display: none !important; }
+
+    /* ── Nav sidebar ─────────────────────────────────────── */
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      color: var(--ink-soft);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all .15s;
+    }
+    .nav-item:hover { background: var(--accent-soft); color: var(--ink); }
+    .nav-item.activo {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-soft) 100%);
+      color: white;
+      box-shadow: 0 4px 14px rgba(15,59,58,0.28);
+    }
+    html[data-theme="dark"] .nav-item.activo {
+      box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    }
+    .nav-item .dot { width: 5px; height: 5px; border-radius: 50%; background: currentColor; opacity: .55; flex-shrink: 0; }
+
+    /* ── Theme toggle ────────────────────────────────────── */
+    .theme-btn {
+      width: 34px; height: 34px;
+      border-radius: 9999px;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--accent-soft);
+      color: var(--accent);
+      border: 1.5px solid rgba(192,138,74,0.22);
+      transition: all .18s;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .theme-btn:hover { background: var(--accent); color: white; transform: scale(1.08) rotate(12deg); }
+
+    /* ── Cards de guardia ────────────────────────────────── */
+    .guardia-card {
+      background: var(--surface);
+      border: 1.5px solid var(--line);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      transition: all .2s cubic-bezier(.4,0,.2,1);
+    }
+    .guardia-card:hover {
+      border-color: var(--primary);
+      transform: translateY(-3px);
+      box-shadow: var(--shadow-md);
+    }
+
+    /* ── Calendario ──────────────────────────────────────── */
+    .cal-cell {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      min-height: 110px;
+      padding: 8px;
+      position: relative;
+      font-size: 12px;
+      transition: background .15s;
+    }
+    .cal-cell.otro-mes { background: var(--bg); color: var(--ink-mute); }
+    .cal-day-num { font-weight: 700; font-size: 13px; color: var(--ink); }
+    .cal-cell.otro-mes .cal-day-num { color: var(--ink-mute); font-weight: 400; }
+    .chip {
+      font-size: 10.5px;
+      padding: 3px 7px;
+      border-radius: 6px;
+      margin-top: 4px;
+      display: block;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      cursor: pointer;
+      font-weight: 500;
+    }
+
+    /* ── Tabla admin ─────────────────────────────────────── */
+    .table-row { border-bottom: 1px solid var(--line); transition: background .15s; }
+    .table-row:last-child { border-bottom: none; }
+    .table-row:hover { background: var(--accent-soft); }
+
+    /* ── Badges ──────────────────────────────────────────── */
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .badge-ok   { background: rgba(30,122,70,.1);   color: var(--ok); }
+    .badge-warn { background: rgba(168,108,24,.1);  color: var(--warn); }
+    .badge-bad  { background: rgba(160,40,40,.1);   color: var(--bad); }
+    .badge-info { background: rgba(30,80,122,.1);   color: var(--info); }
+
+    /* ── Indicadores de sede ─────────────────────────────── */
+    .sede-dot {
+      display: inline-block; width: 8px; height: 8px;
+      border-radius: 50%; margin-right: 6px; vertical-align: middle; flex-shrink: 0;
+    }
+
+    /* ── Decoración ──────────────────────────────────────── */
+    .deco-line { width: 36px; height: 3px; background: var(--accent); border-radius: 9999px; }
+
+    /* ── Modal ───────────────────────────────────────────── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.50);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      z-index: 100;
+      display: none; align-items: center; justify-content: center;
+      padding: 16px;
+    }
+    .modal-overlay.visible { display: flex; }
+    .modal-box {
+      background: var(--surface);
+      border-radius: 26px;
+      border: 1.5px solid var(--line);
+      width: 100%; max-width: 500px; max-height: 90vh;
+      overflow-y: auto; padding: 30px;
+      box-shadow: var(--shadow-lg);
+    }
+  </style>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('/sw.js'));
+    }
+  </script>
+</head>
+
+<body>
+
+<!-- ======================================================= -->
+<!-- VISTA: CARGANDO (pantalla inicial mientras verifica sesión) -->
+<!-- ======================================================= -->
+<div id="vista-cargando" class="vista activa min-h-screen flex items-center justify-center"
+     style="background: var(--bg);">
+
+  <div style="position:relative;z-index:1;text-align:center;">
+
+    <!-- Logo mark -->
+    <div style="display:flex;justify-content:center;margin-bottom:22px;">
+      <svg viewBox="0 0 44 44" width="80" height="80" fill="none"
+           style="filter:drop-shadow(0 8px 28px rgba(15,59,58,0.22));">
+        <rect width="44" height="44" rx="12" fill="#0f3b3a"/>
+        <path d="M 29 14 A 11 11 0 1 0 29 30" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+        <circle cx="29" cy="30" r="3.2" fill="#c08a4a"/>
+        <circle cx="29" cy="14" r="1.8" fill="rgba(255,255,255,0.6)"/>
+      </svg>
+    </div>
+
+    <!-- Wordmark -->
+    <div style="font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:2.1rem;
+                letter-spacing:-0.04em;color:var(--ink);line-height:1;margin-bottom:5px;">
+      Camedi
+    </div>
+    <div style="font-size:10px;color:var(--ink-mute);letter-spacing:3.5px;
+                text-transform:uppercase;margin-bottom:38px;">
+      Sistema de guardias
+    </div>
+
+    <!-- Spinner -->
+    <div style="display:flex;justify-content:center;">
+      <svg width="26" height="26" viewBox="0 0 26 26" fill="none"
+           style="animation:spin .9s linear infinite;">
+        <circle cx="13" cy="13" r="10" stroke="var(--ink)" stroke-width="2" opacity="0.1"/>
+        <path d="M 13 3 A 10 10 0 0 1 23 13" stroke="var(--primary)" stroke-width="2.5"
+              stroke-linecap="round"/>
+      </svg>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: LOGIN                                            -->
+<!-- ======================================================= -->
+<section id="vista-login" class="vista min-h-screen grid lg:grid-cols-2 relative">
+
+  <!-- Toggle de tema (flotante) -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="login-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <!-- Columna izquierda: branding -->
+  <div class="text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden"
+       style="background: linear-gradient(160deg, #0a2e2d 0%, #0f3b3a 50%, #0d3330 100%);">
+    <!-- Patrón de puntos -->
+    <div class="absolute inset-0 opacity-[0.05]"
+         style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 28px 28px;"></div>
+    <!-- Círculo decorativo grande -->
+    <div class="absolute -right-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full opacity-[0.06]"
+         style="border: 2px solid white;"></div>
+    <div class="absolute -right-16 top-1/2 -translate-y-1/2 w-56 h-56 rounded-full opacity-[0.05]"
+         style="border: 1px solid white;"></div>
+
+    <div class="relative z-10">
+      <div class="flex items-center gap-4">
+        <svg viewBox="0 0 44 44" width="56" height="56" fill="none">
+          <rect width="44" height="44" rx="12" fill="rgba(255,255,255,0.13)"/>
+          <path d="M 29 14 A 11 11 0 1 0 29 30" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <circle cx="29" cy="30" r="3.2" fill="#d4a060"/>
+          <circle cx="29" cy="14" r="1.8" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <div>
+          <div class="font-display text-3xl text-white leading-none">Camedi</div>
+          <div class="text-xs text-white/40 tracking-[0.2em] uppercase mt-1">Sistema de guardias</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative z-10 max-w-md">
+      <h1 class="font-display text-5xl lg:text-6xl leading-[1.05] mb-6">
+        Tu trimestre,<br/>
+        <span class="italic" style="color:#c08a4a">organizado</span>.
+      </h1>
+      <p class="text-white/65 text-base leading-relaxed">
+        Inscribite a las guardias del próximo trimestre,
+        consultá tu calendario y gestioná tus turnos desde un solo lugar.
+      </p>
+    </div>
+
+    <!-- Cards decorativas flotantes -->
+    <div class="relative z-10 hidden lg:flex flex-col gap-3 max-w-[210px]">
+      <div class="rounded-2xl px-4 py-3 text-sm"
+           style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(8px);">
+        <div class="text-white/45 text-[10px] uppercase tracking-wider font-semibold mb-1">Guardias confirmadas</div>
+        <div class="text-white font-bold text-xl">3 este mes</div>
+      </div>
+      <div class="rounded-2xl px-4 py-3 text-sm"
+           style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(8px);">
+        <div class="text-white/45 text-[10px] uppercase tracking-wider font-semibold mb-1">Cupos cubiertos</div>
+        <div class="font-bold text-xl" style="color:#d4a060">87%</div>
+      </div>
+    </div>
+
+    <div class="relative z-10 text-xs text-white/40 hidden lg:block">
+      © Camedi 2026 — Acceso restringido a profesionales habilitados.
+    </div>
+  </div>
+
+  <!-- Columna derecha: formulario -->
+  <div class="p-6 lg:p-16 flex items-center justify-center" style="background: var(--bg);">
+    <div class="w-full max-w-sm">
+      <div class="rounded-3xl p-8 mb-2" style="background: var(--surface); box-shadow: var(--shadow-md); border: 1.5px solid var(--line);">
+        <div class="mb-7">
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Iniciar sesión</div>
+          <h2 class="font-display text-3xl">Bienvenido de vuelta</h2>
+          <p class="text-ink-soft mt-2 text-sm">Ingresá con tu email y contraseña.</p>
+        </div>
+
+        <form id="form-login" class="space-y-4" novalidate>
+          <div id="error-login" class="msg-error"></div>
+
+          <div>
+            <label for="login-email">Email</label>
+            <input id="login-email" name="email" type="email"
+              class="input mt-1.5" placeholder="dr.perez@hospital.com"
+              autocomplete="email" />
+          </div>
+          <div>
+            <div class="flex justify-between items-center">
+              <label for="login-pass">Contraseña</label>
+              <button type="button" id="btn-ir-recuperar"
+                class="text-xs text-primary hover:underline font-medium">¿La olvidaste?</button>
+            </div>
+            <input id="login-pass" name="password" type="password"
+              class="input mt-1.5" placeholder="••••••••"
+              autocomplete="current-password" />
+          </div>
+
+          <button type="submit" id="btn-login" class="btn-primary w-full mt-2">
+            <span class="spinner" id="spin-login"></span>
+            <span id="txt-login">Entrar</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="rounded-2xl p-5 text-center" style="background: var(--surface); border: 1.5px solid var(--line);">
+        <p class="text-ink-soft text-sm mb-3">¿No tenés cuenta?</p>
+        <button type="button" id="btn-ir-registro" class="btn-ghost w-full">Crear cuenta nueva</button>
+      </div>
+
+      <div class="rounded-2xl p-4 text-center mt-3" style="background: var(--surface); border: 1.5px solid var(--line);">
+        <p class="text-ink-mute text-xs mb-2">¿Sos una asociación médica?</p>
+        <button type="button" id="btn-ir-login-asociacion" class="btn-ghost w-full text-sm">
+          Acceso para Asociaciones →
+        </button>
+      </div>
+
+      <p class="text-xs text-ink-mute text-center mt-5">
+        Las cuentas nuevas requieren aprobación del administrador.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: LOGIN ASOCIACIONES                               -->
+<!-- ======================================================= -->
+<section id="vista-login-asociacion" class="vista min-h-screen grid lg:grid-cols-2 relative">
+
+  <!-- Toggle de tema (flotante) -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="login-asoc-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <!-- Columna izquierda: branding -->
+  <div class="text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden"
+       style="background: linear-gradient(160deg, #1a2e50 0%, #1e3a5f 50%, #1a3258 100%);">
+    <div class="absolute inset-0 opacity-[0.05]"
+         style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 28px 28px;"></div>
+    <div class="absolute -right-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full opacity-[0.06]"
+         style="border: 2px solid white;"></div>
+
+    <div class="relative z-10">
+      <div class="flex items-center gap-4">
+        <svg viewBox="0 0 44 44" width="56" height="56" fill="none">
+          <rect width="44" height="44" rx="12" fill="rgba(255,255,255,0.13)"/>
+          <path d="M 29 14 A 11 11 0 1 0 29 30" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <circle cx="29" cy="30" r="3.2" fill="#d4a060"/>
+          <circle cx="29" cy="14" r="1.8" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <div>
+          <div class="font-display text-3xl text-white leading-none">Camedi</div>
+          <div class="text-xs text-white/40 tracking-[0.2em] uppercase mt-1">Panel Institucional</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="relative z-10 max-w-md">
+      <h1 class="font-display text-5xl lg:text-6xl leading-[1.05] mb-6">
+        Panel de<br/>
+        <span class="italic" style="color:#c08a4a">Asociación</span>.
+      </h1>
+      <p class="text-white/65 text-base leading-relaxed">
+        Gestioná las guardias, médicos y trimestres de tu asociación médica
+        desde un panel propio y dedicado.
+      </p>
+    </div>
+
+    <div class="relative z-10 hidden lg:flex flex-col gap-3 max-w-[220px]">
+      <div class="rounded-2xl px-4 py-3 text-sm"
+           style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(8px);">
+        <div class="text-white/45 text-[10px] uppercase tracking-wider font-semibold mb-1">Acceso exclusivo</div>
+        <div class="text-white font-bold text-base">Asociaciones habilitadas</div>
+      </div>
+      <div class="rounded-2xl px-4 py-3 text-sm"
+           style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.14); backdrop-filter: blur(8px);">
+        <div class="text-white/45 text-[10px] uppercase tracking-wider font-semibold mb-1">Multi-tenant</div>
+        <div class="font-bold text-base" style="color:#d4a060">Datos aislados por asociación</div>
+      </div>
+    </div>
+
+    <div class="relative z-10 text-xs text-white/40 hidden lg:block">
+      © Camedi 2026 — Acceso restringido a asociaciones habilitadas.
+    </div>
+  </div>
+
+  <!-- Columna derecha: formulario -->
+  <div class="p-6 lg:p-16 flex items-center justify-center" style="background: var(--bg);">
+    <div class="w-full max-w-sm">
+      <div class="rounded-3xl p-8 mb-2" style="background: var(--surface); box-shadow: var(--shadow-md); border: 1.5px solid var(--line);">
+        <div class="mb-7">
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Acceso institucional</div>
+          <h2 class="font-display text-3xl">Panel de Asociación</h2>
+          <p class="text-ink-soft mt-2 text-sm">Ingresá con las credenciales de tu asociación.</p>
+        </div>
+
+        <form id="form-login-asociacion" class="space-y-4" novalidate>
+          <div id="error-login-asociacion" class="msg-error"></div>
+
+          <div>
+            <label for="login-asoc-email">Email</label>
+            <input id="login-asoc-email" name="email" type="email"
+              class="input mt-1.5" placeholder="asociacion@camedi.com"
+              autocomplete="email" />
+          </div>
+          <div>
+            <div class="flex justify-between items-center">
+              <label for="login-asoc-pass">Contraseña</label>
+            </div>
+            <input id="login-asoc-pass" name="password" type="password"
+              class="input mt-1.5" placeholder="••••••••"
+              autocomplete="current-password" />
+          </div>
+
+          <button type="submit" id="btn-login-asociacion" class="btn-primary w-full mt-2"
+                  style="background: #1e3a5f;">
+            <span class="spinner" id="spin-login-asociacion"></span>
+            <span id="txt-login-asociacion">Ingresar al panel</span>
+          </button>
+        </form>
+      </div>
+
+      <div class="rounded-2xl p-5 text-center" style="background: var(--surface); border: 1.5px solid var(--line);">
+        <p class="text-ink-soft text-sm mb-3">¿Sos médico o estás registrando una cuenta?</p>
+        <button type="button" id="btn-volver-login" class="btn-ghost w-full">← Volver al acceso de médicos</button>
+      </div>
+
+      <p class="text-xs text-ink-mute text-center mt-5">
+        Las cuentas de asociaciones son creadas por el administrador del sistema.
+      </p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: REGISTRO                                         -->
+<!-- ======================================================= -->
+<section id="vista-registro" class="vista min-h-screen grid lg:grid-cols-2 relative">
+
+  <!-- Toggle de tema (flotante) -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="registro-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <!-- Columna izquierda: branding -->
+  <div class="text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden"
+       style="background: linear-gradient(160deg, #0a2e2d 0%, #0f3b3a 50%, #0d3330 100%);">
+    <div class="absolute inset-0 opacity-[0.05]"
+         style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 28px 28px;"></div>
+    <div class="absolute -right-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full opacity-[0.06]"
+         style="border: 2px solid white;"></div>
+    <div class="relative z-10">
+      <div class="flex items-center gap-4">
+        <svg viewBox="0 0 44 44" width="56" height="56" fill="none">
+          <rect width="44" height="44" rx="12" fill="rgba(255,255,255,0.13)"/>
+          <path d="M 29 14 A 11 11 0 1 0 29 30" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <circle cx="29" cy="30" r="3.2" fill="#d4a060"/>
+          <circle cx="29" cy="14" r="1.8" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <div>
+          <div class="font-display text-3xl text-white leading-none">Camedi</div>
+          <div class="text-xs text-white/40 tracking-[0.2em] uppercase mt-1">Sistema de guardias</div>
+        </div>
+      </div>
+    </div>
+    <div class="relative z-10 max-w-md">
+      <h1 class="font-display text-4xl lg:text-5xl leading-[1.1] mb-6">
+        Creá tu cuenta<br/>
+        <span class="italic" style="color:#c08a4a">en minutos</span>.
+      </h1>
+      <p class="text-white/65 text-base leading-relaxed">
+        Completá tus datos profesionales. El administrador recibirá tu solicitud
+        y la aprobará a la brevedad.
+      </p>
+    </div>
+    <div class="relative z-10 text-xs text-white/40 hidden lg:block">© Camedi 2026 — Acceso restringido a profesionales habilitados.</div>
+  </div>
+
+  <!-- Columna derecha: formulario -->
+  <div class="p-6 lg:p-16 flex items-center justify-center" style="background: var(--bg);">
+    <div class="w-full max-w-sm">
+      <div class="rounded-3xl p-8" style="background: var(--surface); box-shadow: var(--shadow-md); border: 1.5px solid var(--line);">
+        <div class="mb-6">
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Crear cuenta</div>
+          <h2 class="font-display text-3xl">Datos profesionales</h2>
+        </div>
+
+        <form id="form-registro" class="space-y-4" novalidate>
+          <div id="error-registro" class="msg-error"></div>
+          <div id="ok-registro" class="msg-ok"></div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label for="reg-nombre">Nombre *</label>
+              <input id="reg-nombre" type="text" class="input mt-1.5" placeholder="Juan" autocomplete="given-name" />
+            </div>
+            <div>
+              <label for="reg-apellido">Apellido *</label>
+              <input id="reg-apellido" type="text" class="input mt-1.5" placeholder="Pérez" autocomplete="family-name" />
+            </div>
+          </div>
+
+          <div>
+            <label for="reg-email">Email *</label>
+            <input id="reg-email" type="email" class="input mt-1.5" placeholder="dr.perez@hospital.com" autocomplete="email" />
+          </div>
+
+          <div>
+            <label for="reg-matricula">Matrícula *</label>
+            <input id="reg-matricula" type="text" class="input mt-1.5" placeholder="MN 12345" />
+          </div>
+
+          <div>
+            <label for="reg-especialidad">Especialidad *</label>
+            <input id="reg-especialidad" type="text" class="input mt-1.5" placeholder="Cirugía General" />
+          </div>
+
+          <div>
+            <label for="reg-asociacion">Asociación médica *</label>
+            <select id="reg-asociacion" class="input mt-1.5">
+              <option value="">Cargando…</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="reg-provincia">Provincia donde trabajás *</label>
+            <select id="reg-provincia" class="input mt-1.5">
+              <option value="">— Seleccioná tu provincia —</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="reg-telefono">Teléfono <span class="text-ink-mute font-normal">(opcional)</span></label>
+            <input id="reg-telefono" type="tel" class="input mt-1.5" placeholder="11-1234-5678" autocomplete="tel" />
+          </div>
+
+          <div>
+            <label for="reg-pass">Contraseña * <span class="text-ink-mute font-normal">(mínimo 8 caracteres)</span></label>
+            <input id="reg-pass" type="password" class="input mt-1.5" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+
+          <div>
+            <label for="reg-pass2">Confirmar contraseña *</label>
+            <input id="reg-pass2" type="password" class="input mt-1.5" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+
+          <button type="submit" id="btn-registro" class="btn-primary w-full mt-2">
+            <span class="spinner" id="spin-registro"></span>
+            <span id="txt-registro">Crear cuenta</span>
+          </button>
+        </form>
+      </div>
+
+      <button type="button" id="btn-ir-login-desde-registro"
+        class="mt-4 text-sm text-primary hover:underline w-full text-center block font-medium">
+        ← Ya tengo cuenta
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: RECUPERAR CONTRASEÑA                             -->
+<!-- ======================================================= -->
+<section id="vista-recuperar" class="vista min-h-screen grid lg:grid-cols-2 relative">
+
+  <!-- Toggle de tema -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="recuperar-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <!-- Columna izquierda: branding -->
+  <div class="text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden"
+       style="background: linear-gradient(160deg, #0a2e2d 0%, #0f3b3a 50%, #0d3330 100%);">
+    <div class="absolute inset-0 opacity-[0.05]"
+         style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 28px 28px;"></div>
+    <div class="absolute -right-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full opacity-[0.06]"
+         style="border: 2px solid white;"></div>
+    <div class="relative z-10">
+      <div class="flex items-center gap-4">
+        <svg viewBox="0 0 44 44" width="56" height="56" fill="none">
+          <rect width="44" height="44" rx="12" fill="rgba(255,255,255,0.13)"/>
+          <path d="M 29 14 A 11 11 0 1 0 29 30" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <circle cx="29" cy="30" r="3.2" fill="#d4a060"/>
+          <circle cx="29" cy="14" r="1.8" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <div>
+          <div class="font-display text-3xl text-white leading-none">Camedi</div>
+          <div class="text-xs text-white/40 tracking-[0.2em] uppercase mt-1">Sistema de guardias</div>
+        </div>
+      </div>
+    </div>
+    <div class="relative z-10 max-w-md">
+      <h1 class="font-display text-4xl lg:text-5xl leading-[1.1] mb-6">
+        Recuperá tu<br/>
+        <span class="italic" style="color:#c08a4a">contraseña</span>.
+      </h1>
+      <p class="text-white/65 text-base leading-relaxed">
+        Te enviaremos un enlace a tu email para que puedas restablecer tu acceso de forma segura.
+      </p>
+    </div>
+    <div class="relative z-10 text-xs text-white/40 hidden lg:block">
+      © Camedi 2026 — Acceso restringido a profesionales habilitados.
+    </div>
+  </div>
+
+  <!-- Columna derecha: formulario -->
+  <div class="p-6 lg:p-16 flex items-center justify-center" style="background: var(--bg);">
+    <div class="w-full max-w-sm">
+      <div class="rounded-3xl p-8 mb-2" style="background: var(--surface); box-shadow: var(--shadow-md); border: 1.5px solid var(--line);">
+        <div class="mb-7">
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Recuperar acceso</div>
+          <h2 class="font-display text-3xl">Olvidaste tu contraseña</h2>
+          <p class="text-ink-soft mt-2 text-sm">Ingresá tu email y te enviamos un enlace de restablecimiento.</p>
+        </div>
+
+        <form id="form-recuperar" class="space-y-4" novalidate>
+          <div id="error-recuperar" class="msg-error"></div>
+          <div id="ok-recuperar" class="msg-ok"></div>
+
+          <div>
+            <label for="rec-email">Email</label>
+            <input id="rec-email" type="email" class="input mt-1.5" placeholder="dr.perez@hospital.com" autocomplete="email" />
+          </div>
+
+          <button type="submit" id="btn-recuperar" class="btn-primary w-full">
+            <span class="spinner" id="spin-recuperar"></span>
+            <span id="txt-recuperar">Enviar enlace</span>
+          </button>
+        </form>
+      </div>
+
+      <button type="button" id="btn-ir-login-desde-recuperar"
+        class="mt-2 text-sm text-primary hover:underline w-full text-center block font-medium py-3">
+        ← Volver al login
+      </button>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: CAMBIAR CONTRASEÑA (después del enlace de reset) -->
+<!-- ======================================================= -->
+<section id="vista-cambiar-contrasena" class="vista min-h-screen grid lg:grid-cols-2 relative">
+
+  <!-- Toggle de tema -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="cambiarpass-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <!-- Columna izquierda: branding -->
+  <div class="text-white p-12 lg:p-16 flex flex-col justify-between relative overflow-hidden"
+       style="background: linear-gradient(160deg, #0a2e2d 0%, #0f3b3a 50%, #0d3330 100%);">
+    <div class="absolute inset-0 opacity-[0.05]"
+         style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 28px 28px;"></div>
+    <div class="absolute -right-24 top-1/2 -translate-y-1/2 w-80 h-80 rounded-full opacity-[0.06]"
+         style="border: 2px solid white;"></div>
+    <div class="relative z-10">
+      <div class="flex items-center gap-4">
+        <svg viewBox="0 0 44 44" width="56" height="56" fill="none">
+          <rect width="44" height="44" rx="12" fill="rgba(255,255,255,0.13)"/>
+          <path d="M 29 14 A 11 11 0 1 0 29 30" stroke="white" stroke-width="4.5" fill="none" stroke-linecap="round"/>
+          <circle cx="29" cy="30" r="3.2" fill="#d4a060"/>
+          <circle cx="29" cy="14" r="1.8" fill="rgba(255,255,255,0.6)"/>
+        </svg>
+        <div>
+          <div class="font-display text-3xl text-white leading-none">Camedi</div>
+          <div class="text-xs text-white/40 tracking-[0.2em] uppercase mt-1">Sistema de guardias</div>
+        </div>
+      </div>
+    </div>
+    <div class="relative z-10 max-w-md">
+      <h1 class="font-display text-4xl lg:text-5xl leading-[1.1] mb-6">
+        Elegí una<br/>
+        <span class="italic" style="color:#c08a4a">nueva clave</span>.
+      </h1>
+      <p class="text-white/65 text-base leading-relaxed">
+        Creá una contraseña segura de al menos 8 caracteres. No la compartas con nadie.
+      </p>
+    </div>
+    <div class="relative z-10 text-xs text-white/40 hidden lg:block">
+      © Camedi 2026 — Acceso restringido a profesionales habilitados.
+    </div>
+  </div>
+
+  <!-- Columna derecha: formulario -->
+  <div class="p-6 lg:p-16 flex items-center justify-center" style="background: var(--bg);">
+    <div class="w-full max-w-sm">
+      <div class="rounded-3xl p-8" style="background: var(--surface); box-shadow: var(--shadow-md); border: 1.5px solid var(--line);">
+        <div class="mb-7">
+          <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Restablecer acceso</div>
+          <h2 class="font-display text-3xl">Nueva contraseña</h2>
+          <p class="text-ink-soft mt-2 text-sm">Elegí una contraseña segura de al menos 8 caracteres.</p>
+        </div>
+
+        <form id="form-cambiar-pass" class="space-y-4" novalidate>
+          <div id="error-cambiar-pass" class="msg-error"></div>
+          <div id="ok-cambiar-pass" class="msg-ok"></div>
+
+          <div>
+            <label for="nueva-pass">Nueva contraseña *</label>
+            <input id="nueva-pass" type="password" class="input mt-1.5" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+          <div>
+            <label for="nueva-pass2">Confirmar contraseña *</label>
+            <input id="nueva-pass2" type="password" class="input mt-1.5" placeholder="••••••••" autocomplete="new-password" />
+          </div>
+
+          <button type="submit" id="btn-cambiar-pass" class="btn-primary w-full">
+            <span class="spinner" id="spin-cambiar-pass"></span>
+            <span id="txt-cambiar-pass">Guardar contraseña</span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: CUENTA PENDIENTE DE APROBACIÓN                   -->
+<!-- ======================================================= -->
+<section id="vista-pendiente" class="vista min-h-screen flex items-center justify-center p-6 relative" style="background: var(--bg);">
+
+  <!-- Toggle de tema -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="pendiente-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <div class="w-full max-w-md">
+    <div class="rounded-3xl p-10 text-center" style="background: var(--surface); box-shadow: var(--shadow-lg); border: 1.5px solid var(--line);">
+
+      <!-- Icono animado -->
+      <div class="relative w-20 h-20 mx-auto mb-6">
+        <div class="w-20 h-20 rounded-full flex items-center justify-center"
+             style="background: linear-gradient(135deg, rgba(192,138,74,0.12) 0%, rgba(192,138,74,0.05) 100%); border: 2px solid rgba(192,138,74,0.22);">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#c08a4a" stroke-width="2"
+               stroke-linecap="round" stroke-linejoin="round"
+               style="animation: pulse-soft 2.4s ease-in-out infinite;">
+            <circle cx="12" cy="12" r="10"/>
+            <polyline points="12 6 12 12 16 14"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Estado de cuenta</div>
+      <h2 class="font-display text-3xl mb-3">Cuenta pendiente</h2>
+      <p class="text-ink-soft text-sm leading-relaxed mb-2">
+        Tu cuenta fue creada correctamente. El administrador revisará tu solicitud
+        y la aprobará a la brevedad.
+      </p>
+      <p class="text-ink-mute text-xs mb-8">
+        Una vez aprobada, podrás acceder al sistema con el mismo email y contraseña.
+      </p>
+
+      <div class="flex flex-col gap-3 items-center">
+        <button id="btn-verificar-aprobacion" class="btn-primary w-full">
+          <span class="spinner" id="spin-verificar"></span>
+          <span id="txt-verificar">Verificar aprobación</span>
+        </button>
+        <button id="btn-cerrar-sesion-pendiente" class="text-xs text-ink-mute hover:text-bad transition-colors py-2">
+          Cerrar sesión
+        </button>
+      </div>
+    </div>
+
+    <p class="text-center text-xs text-ink-mute mt-6">Sistema Camedi — © 2026</p>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: ELEGIR SEDES (onboarding del médico)            -->
+<!-- Se muestra la primera vez que un médico activo entra   -->
+<!-- ======================================================= -->
+<section id="vista-elegir-sedes" class="vista min-h-screen flex items-center justify-center p-6 relative" style="background: var(--bg);">
+
+  <!-- Toggle de tema -->
+  <div class="absolute top-5 right-5 z-50">
+    <button onclick="window.toggleTheme()" class="theme-btn" id="sedes-theme-btn" aria-label="Cambiar tema"></button>
+  </div>
+
+  <div class="w-full max-w-lg">
+    <div class="rounded-3xl p-8 lg:p-10" style="background: var(--surface); box-shadow: var(--shadow-lg); border: 1.5px solid var(--line);">
+
+      <div class="text-center mb-8">
+        <div class="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-5"
+             style="background: linear-gradient(135deg, rgba(192,138,74,0.12) 0%, rgba(192,138,74,0.05) 100%); border: 1.5px solid rgba(192,138,74,0.22);">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#c08a4a"
+               stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+            <polyline points="9 22 9 12 15 12 15 22"/>
+          </svg>
+        </div>
+        <div class="text-xs uppercase tracking-[0.18em] text-ink-mute font-semibold mb-2">Configuración inicial</div>
+        <h2 class="font-display text-3xl mb-2">¿Dónde trabajás?</h2>
+        <p class="text-ink-soft text-sm leading-relaxed max-w-sm mx-auto">
+          Elegí tu provincia y las sedes donde hacés guardias. Solo verás esas guardias en el calendario.
+          Podés cambiarlas después desde tu perfil.
+        </p>
+      </div>
+
+      <div class="mb-5">
+        <label class="text-xs font-semibold text-ink-mute uppercase tracking-wider">Provincia</label>
+        <select id="elegir-provincia" class="input mt-1.5 w-full">
+          <option value="">— Seleccioná una provincia —</option>
+        </select>
+      </div>
+
+      <div id="sedes-lista-elegir" class="space-y-2 mb-6">
+        <div class="py-6 text-center text-ink-mute text-sm">
+          <svg class="mx-auto mb-2 opacity-30" width="20" height="20" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/>
+            <line x1="12" y1="16" x2="12.01" y2="16"/>
+          </svg>
+          Seleccioná una provincia para ver las sedes.
+        </div>
+      </div>
+
+      <div id="err-elegir-sedes" class="msg-error mb-4"></div>
+
+      <button id="btn-guardar-sedes" class="btn-primary w-full">
+        <span class="spinner" id="spin-guardar-sedes"></span>
+        <span id="txt-guardar-sedes">Continuar</span>
+      </button>
+    </div>
+
+    <button id="btn-cerrar-sesion-sedes"
+            class="w-full mt-4 text-xs text-ink-mute hover:text-bad transition-colors py-2 text-center block">
+      Cerrar sesión
+    </button>
+  </div>
+</section>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: DASHBOARD MÉDICO                                 -->
+<!-- Contenido renderizado por medico.js en el Paso 5       -->
+<!-- ======================================================= -->
+<div id="vista-medico" class="vista"></div>
+
+
+<!-- ======================================================= -->
+<!-- VISTA: PANEL ADMIN                                      -->
+<!-- Contenido renderizado por admin.js en el Paso 6        -->
+<!-- ======================================================= -->
+<div id="vista-admin" class="vista"></div>
+
+<!-- ======================================================= -->
+<!-- VISTA: PANEL ASOCIACION                                 -->
+<!-- Contenido renderizado por asociacion.js                 -->
+<!-- ======================================================= -->
+<div id="vista-asociacion" class="vista"></div>
+
+
+<!-- ======================================================= -->
+<!-- MODAL DE GUARDIA (compartido entre médico y admin)      -->
+<!-- Contenido dinámico según contexto                       -->
+<!-- ======================================================= -->
+<div id="modal-guardia" class="modal-overlay" role="dialog" aria-modal="true">
+  <div class="modal-box">
+    <div class="flex items-start justify-between mb-5">
+      <div>
+        <div id="modal-dia" class="text-xs text-ink-mute uppercase tracking-wider mb-1"></div>
+        <h3 id="modal-fecha" class="font-display text-2xl"></h3>
+      </div>
+      <button id="btn-cerrar-modal"
+        class="w-8 h-8 rounded-full flex items-center justify-center text-ink-mute hover:bg-line transition-colors"
+        aria-label="Cerrar">✕</button>
+    </div>
+    <div id="modal-cuerpo" class="space-y-3 text-sm text-ink-soft"></div>
+    <div id="modal-acciones" class="mt-6 flex gap-3 flex-wrap"></div>
+  </div>
+</div>
+
+
+
+<!-- ======================================================= -->
+<!-- Modo oscuro / claro                                     -->
+<!-- ======================================================= -->
+<script>
+(function () {
+  var THEME_KEY = 'camedi-theme';
+  var SUN  = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>';
+  var MOON = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+
+  function updateIcons() {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    document.querySelectorAll('.theme-btn').forEach(function (btn) {
+      btn.innerHTML = dark ? SUN : MOON;
+      btn.title = dark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro';
+    });
+  }
+
+  window.toggleTheme = function () {
+    var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    var next = dark ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem(THEME_KEY, next);
+    updateIcons();
+  };
+
+  window.initTheme = function () {
+    var saved = localStorage.getItem(THEME_KEY);
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = saved || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+    updateIcons();
+  };
+
+  window.updateThemeIcons = updateIcons;
+
+  initTheme();
+
+  /* Re-sync icons after the DOM is fully loaded (for buttons added later) */
+  document.addEventListener('DOMContentLoaded', updateIcons);
+})();
+</script>
+
+<!-- ======================================================= -->
+<!-- Punto de entrada de JavaScript                          -->
+<!-- ======================================================= -->
+<script type="module" src="js/auth.js"></script>
+
+</body>
+</html>
