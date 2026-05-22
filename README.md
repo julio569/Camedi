@@ -121,58 +121,11 @@ camedi/
 
 
 ---
-
-## Local Setup
-
-### Prerequisites
-- A [Supabase](https://supabase.com) project (free tier works)
-- Any static file server (VS Code Live Server, `npx serve`, etc.)
-
-### Steps
-
-**1. Clone the repository**
-```bash
-git clone https://github.com/YOUR_USERNAME/camedi.git
-cd camedi
-2. Configure environment variables
+)
 
 
-cp .env.example .env
-Edit .env:
+### About the Developer
 
-
-SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
-These values are injected into js/supabase-client.js. For local development you can set them directly in that file.
-
-3. Run database migrations
-
-Open the Supabase SQL Editor and run the files in sql/ in numerical order (01 → 16).
-
-Each file is idempotent (CREATE IF NOT EXISTS, DROP IF EXISTS before recreating).
-
-4. Serve the app
-
-
-npx serve .
-# or open index.html directly in a browser
-No build step, no package manager, no bundler required.
-
-Screenshots
-Replace the placeholders below with actual screenshots.
-
-View	Preview
-Login / Register	docs/screenshots/auth.png
-Doctor Calendar	docs/screenshots/calendar.png
-Association Dashboard	docs/screenshots/dashboard-asociacion.png
-Admin Panel	docs/screenshots/admin.png
-Onboarding — Choose locations	docs/screenshots/onboarding.png
-Mobile (PWA installed)	docs/screenshots/mobile-pwa.png
-Security Notes
-All sensitive operations (inscription, cancellation, quota checks) run inside PostgreSQL SECURITY DEFINER RPCs — the client cannot bypass validation by hitting the table directly.
-Every table has Row Level Security enabled. Tenants are strictly isolated at the database level.
-HTTP security headers (CSP, HSTS, X-Frame-Options) are set via Netlify _headers.
-About the Developer
 Built and maintained by Julio Nacif — full-stack developer and founder of Camedi.
 
 Designed, architected and shipped as a solo project: database schema, multi-tenant RLS policies, PWA configuration, UI/UX and production deployment.
